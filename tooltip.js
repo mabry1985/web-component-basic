@@ -35,6 +35,9 @@ class Tooltip extends HTMLElement {
         ::slotted(.highlight) {
           border-bottom: 1px dotted red;        }
 
+        .tip {
+          cursor: help;
+        }
       </style>
       <slot>Some default</slot>
       <span class="tip" > (?)<span>
