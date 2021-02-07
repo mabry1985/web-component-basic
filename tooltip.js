@@ -61,6 +61,21 @@ class Tooltip extends HTMLElement {
   _hideTooltip = () => {
     this.shadowRoot.removeChild(this._tooltipContainer);
   }
+  
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+
+    if (name === 'tip-text') {
+      this._tooltipText = newValue;
+    }
+
+  }
+  
+  static get observedAttributes() {
+    return ['tip-text'];
+  }
+
 }
+
 
 customElements.define('jm-tooltip', Tooltip)
