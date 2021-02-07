@@ -1,10 +1,10 @@
 class Tooltip extends HTMLElement {
   constructor() {
     super();
-    this._tooltipContainer;
     this._tooltipIcon;
-    this._tooltipText = 'Some dummy text.';
-    this.attachShadow({ mode: 'open' });
+    this._tooltipVisible = false;
+    this._tooltipText = "Some dummy text.";
+    this.attachShadow({ mode: "open" });
     this.shadowRoot.innerHTML = `
       <style>
         div {
@@ -37,19 +37,19 @@ class Tooltip extends HTMLElement {
 
       </style>
       <slot>Some default</slot>
-      <span> (?)<span>
+      <span class="tip" > (?)<span>
     `;
-    
   }
-  
+
   connectedCallback() {
-    if(this.hasAttribute('tip-text')) {
-      this._tooltipText = this.getAttribute('tip-text');
+    if (this.hasAttribute("tip-text")) {
+      this._tooltipText = this.getAttribute("tip-text");
     }
-    this.tooltipIcon = this.shadowRoot.querySelector('span');
-    this.tooltipIcon.addEventListener('mouseenter', this._showTooltip);
-    this.tooltipIcon.addEventListener('mouseleave', this._hideTooltip);
-    this.style.position = 'relative';
+    this.tooltipIcon = this.shadowRoot.querySelector("span");
+    this.tooltipIcon.addEventListener("mouseenter", this._showTooltip);
+    this.tooltipIcon.addEventListener("mouseleave", this._hideTooltip);
+    this.style.position = "relative";
+    this._render();
   }
 
   disconnectedCallback() {
@@ -57,30 +57,41 @@ class Tooltip extends HTMLElement {
     this.tooltipIcon.removeEventListener("mouseleave", this._hideTooltip);
   }
 
-  _showTooltip = () => {
-    this._tooltipContainer = document.createElement('div');
-    this._tooltipContainer.textContent = this._tooltipText;
-    this.shadowRoot.appendChild(this._tooltipContainer);
+  _render() {
+    let tooltipContainer = this.shadowRoot.querySelector('div');
+
+    if (this._tooltipVisible) {
+      tooltipContainer = document.createElement("div");
+      tooltipContainer.textContent = this._tooltipText;
+      this.shadowRoot.appendChild(tooltipContainer);
+    } else {
+      if (tooltipContainer) {
+        this.shadowRoot.removeChild(tooltipContainer);
+      }
+    }
   }
 
+  _showTooltip = () => {
+    this._tooltipVisible = true;
+    this._render();
+  };
+
   _hideTooltip = () => {
-    this.shadowRoot.removeChild(this._tooltipContainer);
-  }
-  
+    this._tooltipVisible = false;
+    this._render();
+  };
+
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
 
-    if (name === 'tip-text') {
+    if (name === "tip-text") {
       this._tooltipText = newValue;
     }
-
   }
-  
+
   static get observedAttributes() {
-    return ['tip-text'];
+    return ["tip-text"];
   }
-
 }
 
-
-customElements.define('jm-tooltip', Tooltip)
+customElements.define("jm-tooltip", Tooltip);
